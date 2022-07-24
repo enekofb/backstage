@@ -215,3 +215,10 @@ start: dev
 # convenience: dev alias
 .PHONY: run
 run: dev
+
+create-dev-cluster:
+	kind create cluster --name backstage
+
+dev-cluster: ## Start a dev server with Tilt
+	tilt up
+

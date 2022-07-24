@@ -1,3 +1,25 @@
+FROM node:14-bullseye AS build
+USER node
+WORKDIR /home/node
+COPY --chown=node:node package.json /home/node
+COPY --chown=node:node .npmrc /home/node
+COPY --chown=node:node yarn.lock /home/node
+COPY --chown=node:node Makefile /home/node
+
+ARG REACT_APP_DISABLE_PROGRESSIVE_DELIVERY
+ARG GITHUB_TOKEN
+RUN make node_modules
+
+COPY --chown=node:node . /home/node
+ARG version
+RUN make build VERSION=${version}
+
+FROM alpine:3.9
+RUN apk add --no-cache bash openssh-client
+
+
+
+
 ARG IMAGE_TAG=14-alpine
 
 FROM node:${IMAGE_TAG}

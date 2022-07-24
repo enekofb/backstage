@@ -1,0 +1,22 @@
+load('ext://restart_process', 'docker_build_with_restart')
+load('ext://helm_resource', 'helm_resource', 'helm_repo')
+
+helm_repo('ingress-nginx', 'https://kubernetes.github.io/ingress-nginx')
+helm_resource('nginx-ingress', 'ingress-nginx/ingress-nginx')
+
+k8s_yaml('chart/namespace.yaml')
+
+if not os.path.exists("./chart/backstage"):
+    fail("backstage chart not found")
+
+backstage = helm(
+  './chart/backstage',
+  name='backstage',
+  # The namespace to install in, equivalent to helm --namespace
+  namespace='backstage',
+  # The values file to substitute into the chart.
+  values=['./chart/dev-values.yaml'],
+  )
+
+k8s_yaml(backstage)
+
